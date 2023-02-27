@@ -30,7 +30,7 @@ function app(people) {
             break;
         case "no":
             //! TODO #4: Declare a searchByTraits (multiple traits) function //////////////////////////////////////////
-                //! TODO #4a: Provide option to search for single or multiple //////////////////////////////////////////
+            //! TODO #4a: Provide option to search for single or multiple //////////////////////////////////////////
             searchResults = searchByTraits(people);
             break;
         default:
@@ -140,6 +140,17 @@ function displayPeople(people) {
 function displayPerson(person) {
     let personInfo = `First Name: ${person.firstName}\n`;
     personInfo += `Last Name: ${person.lastName}\n`;
+    personInfo += `Gender: ${person.gender}\n`
+    personInfo += `Date of Birth: ${person.dob}\n`
+    personInfo += `Height: ${person.height}\n`
+    personInfo += `Weight: ${person.weight}\n`
+    personInfo += `Eye Color: ${person.eyeColor}\n`
+    personInfo += `Occupation: ${person.occupation}\n`
+    // TODO: Create function to get parents and spouse by ID
+    personInfo += `Parents: ${person.parents}\n`
+    personInfo += `Spouse: ${people.filter((el) => {
+        if (person.currentSpouse === people.id) { }
+    })}`
     //! TODO #1a: finish getting the rest of the information to display //////////////////////////////////////////
     alert(personInfo);
 }
