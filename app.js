@@ -66,7 +66,7 @@ function mainMenu(person, people) {
         case "info":
             //! TODO #1: Utilize the displayPerson function //////////////////////////////////////////
             // HINT: Look for a person-object stringifier utility function to help
-            let personInfo = displayPerson(person[0]);
+            let personInfo = displayPerson(person[0], people);
             alert(personInfo);
             break;
         case "family":
@@ -137,7 +137,7 @@ function displayPeople(people) {
  * in order to easily send the information to the user in the form of an alert().
  * @param {Object} person       A singular object.
  */
-function displayPerson(person) {
+function displayPerson(person, people) {
     let personInfo = `First Name: ${person.firstName}\n`;
     personInfo += `Last Name: ${person.lastName}\n`;
     personInfo += `Gender: ${person.gender}\n`
@@ -146,12 +146,10 @@ function displayPerson(person) {
     personInfo += `Weight: ${person.weight}\n`
     personInfo += `Eye Color: ${person.eyeColor}\n`
     personInfo += `Occupation: ${person.occupation}\n`
-    // TODO: Create function to get parents and spouse by ID
-    personInfo += `Parents: ${person.parents}\n`
-    personInfo += `Spouse: ${people.filter((el) => {
-        if (person.currentSpouse === people.id) { }
-    })}`
-    //! TODO #1a: finish getting the rest of the information to display //////////////////////////////////////////
+    const parents = getParents(person, people);
+    personInfo += `Parents: ${parents}\n`
+    const spouseInfo = getSpouse(person, people);
+    personInfo += `Spouse: ${spouseInfo}`
     alert(personInfo);
 }
 // End of displayPerson()
@@ -195,3 +193,40 @@ function chars(input) {
 
 //////////////////////////////////////////* End Of Starter Code *//////////////////////////////////////////
 // Any additional functions can be written below this line 👇. Happy Coding! 😁
+
+/**
+
+This function returns the names of the parents of a given person as a formatted string.
+If the parents are not found in the data set, "Unknown" is returned for their name.
+@param {Object} person A singular object.
+@returns {String} A string containing the formatted names of the person's parents.
+*/
+function getParents(person, people) {
+    let parents = [];
+    if (person.parents.length === 0) {
+        parents.push("Unknown");
+        parents.push("Unknown");
+    } else {
+        for (let i = 0; i < person.parents.length; i++) {
+            let parent = people.find(p => p.id === person.parents[i]);
+            parents.push(`${parent.firstName} ${parent.lastName}`);
+        }
+    }
+    return parents.join(" & ");
+}
+
+/**
+
+This function returns the name of the spouse of a given person as a formatted string.
+If the spouse is not found in the data set, "Unknown" is returned for their name.
+@param {Object} person A singular object.
+@returns {String} A string containing the formatted name of the person's spouse.
+*/
+function getSpouse(person, people) {
+    if (person.currentSpouse === null) {
+        return "Unknown";
+    } else {
+        let spouse = people.find(p => p.id === person.currentSpouse);
+        return `${spouse.firstName} ${spouse.lastName}`;
+    }
+}
