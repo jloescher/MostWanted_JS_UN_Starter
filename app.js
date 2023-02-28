@@ -64,13 +64,10 @@ function mainMenu(person, people) {
     // Routes our application based on the user's input
     switch (displayOption) {
         case "info":
-            //! TODO #1: Utilize the displayPerson function //////////////////////////////////////////
-            // HINT: Look for a person-object stringifier utility function to help
             let personInfo = displayPerson(person[0], people);
             alert(personInfo);
             break;
         case "family":
-            //! TODO #2: Declare a findPersonFamily function //////////////////////////////////////////
             // HINT: Look for a people-collection stringifier utility function to help
             let personFamily = findPersonFamily(person[0], people);
             alert(personFamily);
@@ -199,6 +196,7 @@ function chars(input) {
 This function returns the names of the parents of a given person as a formatted string.
 If the parents are not found in the data set, "Unknown" is returned for their name.
 @param {Object} person A singular object.
+@param {Array} people An array of person objects.
 @returns {String} A string containing the formatted names of the person's parents.
 */
 function getParents(person, people) {
@@ -220,6 +218,7 @@ function getParents(person, people) {
 This function returns the name of the spouse of a given person as a formatted string.
 If the spouse is not found in the data set, "Unknown" is returned for their name.
 @param {Object} person A singular object.
+@param {Array} people An array of person objects.
 @returns {String} A string containing the formatted name of the person's spouse.
 */
 function getSpouse(person, people) {
@@ -229,4 +228,29 @@ function getSpouse(person, people) {
         let spouse = people.find(p => p.id === person.currentSpouse);
         return `${spouse.firstName} ${spouse.lastName}`;
     }
+}
+
+/**
+This function returns an array of family members names.
+
+@param { Object } person A singular object.
+@param { Array } people An array of person objects.
+@returns { String } A string containing the formatted name of the person's spouse.
+*/
+function findPersonFamily(person, people) {
+    let targetPerson = people.find(p => p.id === person.id)
+    if (!targetPerson) {
+        return null
+    }
+
+    const lastName = person.lastName
+
+    const familyMembers = people.filter(p => p.lastName === lastName)
+
+    let familyMemberNames = familyMembers.map((el) => {
+        return `${el.firstName} ${el.lastName}`
+    })
+
+    return familyMemberNames
+
 }
