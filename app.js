@@ -73,7 +73,6 @@ function mainMenu(person, people) {
             alert(personFamily);
             break;
         case "descendants":
-            //! TODO #3: Declare a findPersonDescendants function //////////////////////////////////////////
             // HINT: Review recursion lecture + demo for bonus user story
             let personDescendants = findPersonDescendants(person[0], people);
             alert(personDescendants);
@@ -254,3 +253,32 @@ function findPersonFamily(person, people) {
     return familyMemberNames
 
 }
+
+/**
+ * Finds all descendants of a given person in a people.
+ * @param {Object} person - The person object to find descendants for.
+ * @param {Object[]} people - The array of person objects representing the people.
+ * @returns {Object[]} An array of person objects representing the descendants of the given person.
+ */
+function findPersonDescendants(person, people) {
+    // Initialize an empty array to hold the descendants.
+    const descendants = [];
+    const descendantNames = [];
+
+    // Loop through each person in the people.
+    for (let i = 0; i < people.length; i++) {
+        const currentPerson = people[i];
+
+        // If the current person is a child of the given person, add them to the descendants array and
+        // recursively call this function to find their descendants.
+        if (currentPerson.parents.includes(person.id)) {
+            descendants.push(`${currentPerson.firstName} ${currentPerson.lastName}\n`);
+            descendants.push(...findPersonDescendants(currentPerson, people));
+        }
+    }
+
+    // Return the array of descendants.
+    return descendants;
+}
+
+
