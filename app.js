@@ -263,7 +263,6 @@ function findPersonFamily(person, people) {
 function findPersonDescendants(person, people) {
     // Initialize an empty array to hold the descendants.
     const descendants = [];
-    const descendantNames = [];
 
     // Loop through each person in the people.
     for (let i = 0; i < people.length; i++) {
@@ -282,3 +281,91 @@ function findPersonDescendants(person, people) {
 }
 
 
+function searchByTraits(people) {
+    let mode = promptFor(`Do you want to search to a 'single' trait or 'multiple' traits? Enter your choice below.`, chars);
+    mode = mode.trim()
+    switch (mode) {
+        case "single":
+            return searchByTrait(people)
+        case "multiple":
+            return searchByMultipleTraits(people)
+        case "restart":
+            // Restart app() from the very beginning
+            app(people);
+            break;
+        case "quit":
+            // Stop application execution
+            return;
+        default:
+            // Prompt user again. Another instance of recursion
+            return searchByTraits(people);
+    }
+}
+
+function searchByTrait(people) {
+    let trait = prompt(`Please enter one of the traits you can choose to search by are 'gender', 'dob', 'height', 'weight', 'eyecolor', and 'occupation'.`)
+    let traitValue = prompt(`Please enter the ${trait}.`)
+
+    if (trait === "height" || trait === "weight") {
+        traitValue = Number(traitValue)
+    }
+
+    if (trait === "eyecolor") {
+        trait = "eyeColor"
+    }
+    let results = people.filter(person => {
+        if (person[trait] === traitValue) {
+            return true
+        } else {
+            return false
+        }
+    })
+
+    return results
+}
+
+function searchByMultipleTraits(people) {
+    let getTraits = true
+    let traits = []
+    while (getTraits) {
+        let trait = prompt(`Please enter one of the traits you can choose to search by are 'gender', 'dob', 'height', 'weight', 'eyecolor', and 'occupation'.`)
+
+        let traitValue = prompt(`Please enter the ${trait}`)
+
+        if (trait === "height" || trait === "weight") {
+            traitValue = Number(traitValue)
+        }
+
+        if (trait === "eyecolor") {
+            trait = "eyeColor"
+        }
+
+        let traitPair = {
+            [trait]: traitValue
+        }
+
+        traits.push(traitPair)
+
+        let getTraitsInput = prompt(`Do you want to enter more traits? 'yes' / 'no'`)
+        getTraitsInput.trim().toLowerCase()
+        if (getTraitsInput === "no") {
+            getTraits = false
+        }
+
+    }
+
+    let results = people.filter(person => {
+        // the objects are not getting parsed and the trait and traitValue are undefined so everything matches.
+        for (let i = 0; i < traits.length; i++) {
+            let { trait, traitValue } = traits[i]
+            if (person[trait] === traitValue) {
+                return true
+            } else {
+                return false
+            }
+        }
+
+    })
+    return results
+
+}
