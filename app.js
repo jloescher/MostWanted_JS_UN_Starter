@@ -29,8 +29,6 @@ function app(people) {
             searchResults = searchByName(people);
             break;
         case "no":
-            //! TODO #4: Declare a searchByTraits (multiple traits) function //////////////////////////////////////////
-            //! TODO #4a: Provide option to search for single or multiple //////////////////////////////////////////
             searchResults = searchByTraits(people);
             break;
         default:
@@ -250,8 +248,7 @@ function findPersonFamily(person, people) {
         return `${el.firstName} ${el.lastName}`
     })
 
-    return familyMemberNames
-
+    return familyMemberNames.join("\n")
 }
 
 /**
@@ -271,66 +268,107 @@ function findPersonDescendants(person, people) {
         // If the current person is a child of the given person, add them to the descendants array and
         // recursively call this function to find their descendants.
         if (currentPerson.parents.includes(person.id)) {
-            descendants.push(`${currentPerson.firstName} ${currentPerson.lastName}\n`);
-            descendants.push(...findPersonDescendants(currentPerson, people));
+            descendants.push(`${currentPerson.firstName} ${currentPerson.lastName}`);
+            descendants.push(findPersonDescendants(currentPerson, people));
         }
     }
 
     // Return the array of descendants.
-    return descendants;
+    return descendants.join("\n")
 }
-
 
 function searchByTraits(people) {
-    let mode = promptFor(`Do you want to search to a 'single' trait or 'multiple' traits? Enter your choice below.`, chars);
-    mode = mode.trim()
-    switch (mode) {
-        case "single":
-            return searchByTrait(people)
-        case "multiple":
-            return searchByMultipleTraits(people)
-        case "restart":
-            // Restart app() from the very beginning
-            app(people);
-            break;
-        case "quit":
-            // Stop application execution
-            return;
-        default:
-            // Prompt user again. Another instance of recursion
-            return searchByTraits(people);
-    }
+    const mode = searchMode()
+    const traits = searchTrait(mode)
+
+    const searchResults = searchByTrait(traits, people)
 }
 
-function searchByTrait(people) {
-    let trait = prompt(`Please enter one of the traits you can choose to search by are 'gender', 'dob', 'height', 'weight', 'eyecolor', and 'occupation'.`)
-    let traitValue = prompt(`Please enter the ${trait}.`)
+function searchByTrait(traits, people) {
+    let searchResults = people
+    while (searchResults.length === 0 || searchResults.length > 1) {
+        for (let i = 0; i < traits.length; i++) {
+            let trait = Object.keys(traits[0])[0]
+            let traitValue = traits[i][trait]
+            switch (trait) {
+                case 'main menu':
+                    return app(people);
+                case 'gender':
+                    searchResults = getGender(searchResults, traitValue)
+                    if (searchResults.length != 0) {
+                        alert(getResults(searchResults))
+                        break;
+                    }
+                    else;
+                    return searchByTraits(people);
 
-    if (trait === "height" || trait === "weight") {
-        traitValue = Number(traitValue)
-    }
+                case 'dob':
+                    searchResults = getDob(searchResults, traitValue)
+                    if (searchResults.length != 0) {
+                        alert(getResults(searchResults))
+                        break;
+                    }
+                    else;
+                    return searchByTraits(people);
+                case 'height':
+                    searchResults = getHeight(searchResults, traitValue)
+                    if (searchResults.length != 0) {
+                        alert(getResults(searchResults))
+                        break;
+                    }
+                    else;
+                    return searchByTraits(people);
+                case 'weight':
+                    searchResults = getWeight(searchResults, traitValue)
+                    if (searchResults.length != 0) {
+                        alert(getResults(searchResults))
+                        break;
+                    }
+                    else;
+                    return searchByTraits(people);
+                case 'eyeColor':
+                    searchResults = getEyeColor(searchResults, traitValue)
+                    if (searchResults.length != 0) {
+                        alert(getResults(searchResults))
+                        break;
+                    }
+                    else;
+                    return searchByTraits(people);
+                case 'occupation':
+                    searchResults = getOccupation(searchResults, traitValue)
+                    if (searchResults.length != 0) {
+                        alert(getResults(searchResults))
+                        break;
+                    }
+                    else;
+                    return searchByTraits(people);
+                default:
+                    return app(people);
 
-    if (trait === "eyecolor") {
-        trait = "eyeColor"
-    }
-    let results = people.filter(person => {
-        if (person[trait] === traitValue) {
-            return true
-        } else {
-            return false
+            }
         }
-    })
-
-    return results
+    }
+    return searchResults;
 }
 
-function searchByMultipleTraits(people) {
-    let getTraits = true
-    let traits = []
-    while (getTraits) {
-        let trait = prompt(`Please enter one of the traits you can choose to search by are 'gender', 'dob', 'height', 'weight', 'eyecolor', and 'occupation'.`)
+function searchMode() {
+    let mode = promptFor(`Do you want to search to a 'single' trait, 'multiple' traits or 'restart the app?\nEnter your choice below.`, chars);
+    mode = mode.toLowerCase().trim()
+    return mode
+}
 
-        let traitValue = prompt(`Please enter the ${trait}`)
+function searchTrait(mode) {
+    let traits = []
+    if (mode === 'single') {
+        let trait = promptFor("What trait do you want to search by:\nGender\nDOB\nHeight\nWeight\nEyeColor\nOccupation\nor return to 'main menu'", chars);
+        trait = trait.toLowerCase().trim()
+        let traitValue
+        if (trait === "occupation") {
+            traitValue = promptFor('Enter the occupation:\navailable occupations:\n• programmer\n• assistant\n• landscaper\n• nurse\n• student\n• architect\n• doctor\n• politician', chars)
+        } else { traitValue = promptFor(`Please enter the ${trait}:`, chars) }
+
+        traitValue = traitValue.toLowerCase().trim()
+
 
         if (trait === "height" || trait === "weight") {
             traitValue = Number(traitValue)
@@ -346,26 +384,105 @@ function searchByMultipleTraits(people) {
 
         traits.push(traitPair)
 
-        let getTraitsInput = prompt(`Do you want to enter more traits? 'yes' / 'no'`)
-        getTraitsInput.trim().toLowerCase()
-        if (getTraitsInput === "no") {
-            getTraits = false
-        }
-
+        return traits
     }
 
-    let results = people.filter(person => {
-        // the objects are not getting parsed and the trait and traitValue are undefined so everything matches.
-        for (let i = 0; i < traits.length; i++) {
-            let { trait, traitValue } = traits[i]
-            if (person[trait] === traitValue) {
-                return true
-            } else {
-                return false
+    if (mode === 'multiple') {
+        let getTraits = true
+        while (getTraits) {
+            let trait = promptFor(
+                "What trait do you want to search by:\nGender\nDOB\nHeight\nWeight\nEyeColor\nOccupation\nor return to 'main menu'", chars);
+
+            let traitValue = promptFor(`Please enter the ${trait}`, chars)
+
+            if (trait === "height" || trait === "weight") {
+                traitValue = Number(traitValue)
+            }
+
+            if (trait === "eyecolor") {
+                trait = "eyeColor"
+            }
+
+            let traitPair = {
+                [trait]: traitValue
+            }
+
+            traits.push(traitPair)
+
+            let getTraitsInput = promptFor(`Do you want to enter more traits? 'yes' / 'no'`, chars)
+            getTraitsInput.trim().toLowerCase()
+            if (getTraitsInput === "no") {
+                getTraits = false
             }
         }
+        return traits
+    }
+    return traits
+}
 
+function getGender(people, traitValue) {
+    let searchResults = people.filter(function (people) {
+        if (people.gender === traitValue) {
+            return true;
+        }
     })
-    return results
+    return searchResults;
 
+}
+function getDob(people, traitValue) {
+    let searchResults = people.filter(function (people) {
+        if (people.dob === traitValue) {
+            return true;
+        }
+    })
+    return searchResults;
+}
+function getHeight(people, traitValue) {
+    let searchResults = people.filter(function (people) {
+        if (people.height === traitValue) {
+            return true;
+        }
+    })
+    return searchResults;
+}
+function getWeight(people, traitValue) {
+    let searchResults = people.filter(function (people) {
+        if (people.weight === traitValue) {
+            return true;
+        }
+    })
+    return searchResults;
+}
+function getEyeColor(people, traitValue) {
+    let searchResults = people.filter(function (people) {
+        if (people.eyeColor === traitValue) {
+            return true;
+        }
+    })
+    return searchResults;
+}
+
+function getOccupation(people, traitValue) {
+    // let searchPrompt = promptFor(
+    //     'Enter the occupation:\navailable occupations: programmer, assistant, landscaper, nurse, student, architect, doctor, politician', chars
+    // )
+    let searchResults = people.filter(function (people) {
+        if (people.occupation === traitValue) {
+            return true;
+        }
+    })
+    return searchResults;
+}
+
+function getResults(searchResults) {
+    let display = `Name: ${searchResults[0].firstName} ${searchResults[0].lastName}\n`;
+    for (let i = 1; i < searchResults.length; i++) {
+        display += `Name: ${searchResults[i].firstName} ${searchResults[i].lastName}\n`;
+
+    }
+    return display;
+}
+
+function capitalizeName(input) {
+    return input.charAt(0).toUpperCase() + input.slice(1);
 }
